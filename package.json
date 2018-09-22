@@ -1,0 +1,22 @@
+{
+  "name": "exceptional-exception-handling",
+  "version": "0.1.0",
+  "description": "A Reveal.js presentation covering best practices for handling exceptions that when followed will endow the reader with exceptional exception handling skills.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ezzy1337/exceptional-exception-handling.git"
+  },
+  "keywords": [
+    "exception"
+  ],
+  "author": "Derek Drummond",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ezzy1337/exceptional-exception-handling/issues"
+  },
+  "homepage": "https://github.com/ezzy1337/exceptional-exception-handling#readme"
+}
