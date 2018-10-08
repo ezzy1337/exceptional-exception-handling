@@ -4,10 +4,10 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-		<title>reveal.js</title>
+		<title>Exception Handling</title>
 
 		<link rel="stylesheet" href="css/reveal.css">
-		<link rel="stylesheet" href="css/theme/black.css">
+		<link rel="stylesheet" href="css/theme/league.css">
 
 		<!-- Theme used for syntax highlighting of code -->
 		<link rel="stylesheet" href="lib/css/zenburn.css">
@@ -24,8 +24,171 @@
 	<body>
 		<div class="reveal">
 			<div class="slides">
-				<section>Slide 1</section>
-				<section>Slide 2</section>
+				<section><!--Intro-->
+					<h2>Exceptional Exception Handling</h2>
+					<p class=fragment>Hi I'm Derek</p>
+				</section>
+				<section class="stack"><!--Bio-->
+					<h2>Shameless Narcissism</h2>
+					<section>
+						<h2 class="fragment">I'm employed</h2>
+						<p class="fragment">I work at ____________.</p><!--Cylance Inc.-->
+					</section>
+					<section>
+						<h2>I'm got a fancy piece of paper.</h2>
+						<p class="fragment">I graduated from ____________.</p><!--Colorado State University-->
+					</section>
+					<section>
+						<h2>Three of my hobbies are:</h2>
+						<ul>
+							<li class="fragment">Performing ____________.</li><!--Magic-->
+							<li class="fragment">Playing ____________.</li><!--Board Games-->
+							<li class="fragment">Watching my favourite movies, ____________.</li><!--Star Wars-->
+						</ul>
+					</section>
+					<section>
+						<h2>Freebie</h2>
+						<p class="fragment">I like trivia.</p>
+					</section>
+				</section>
+				<section><!--Trivia 1-->
+					<h2>What was the first language to introduce exception handling?</h2>
+					<p class="fragment">LISP 1.5</p>
+					<aside class="notes">
+						<ul>
+							<li>Released in 1962</li>
+							<li>Used ERRSET keyword. returned NIL when there was an error.</li>
+						</ul>
+					</aside>
+				</section>
+				<section><!--Trivia 2-->
+					<h2>When were the Catch/Throw keywords first used?</h2>
+					<p class="fragment">1972</p>
+					<aside class="notes">
+						<ul>
+							<li>What we now call `finally` was introduced by the New Implementation of LISP (NIL) in mid 70's.</li>
+							<li>UNWIND-PROTECT</li>
+						</ul>
+					</aside>
+				</section>
+				<section><!--Trivia 3-->
+					<h2>When was the first paper on Structured Exception Handling Written?</h2>
+					<p class="fragment">1975</p>
+					<aside class="notes">
+						<p>Written by John Goodenough.</p>
+					</aside>
+				</section>
+				<section><!--Trivia 4-->
+					<h2>What are developers exceptionally bad at?</h2>
+					<p class="fragment">Exception Handling</p>
+				</section>
+				<section><!--Prevention-->
+					<h2>Prevention</h2>
+					<aside class="notes">
+						<p>This is all about avoiding the anti-patterns, and mistakes that lead to poorly structured code.
+					</aside>
+				</section>
+				<section class="stack"><!--Best Practice: Don't return null-->
+					<h2>Do Not Return Null Values</h2>
+					<section>
+						<p class="fragment">null, None, nil, undefined etc.</p>
+					</section>
+					<section><!--class SettlersOfCatan-->
+<pre><code class="hljs lang-python">class SettlersOfCatan:
+  def can_build_at(self, x, y)
+    for settlement in self.settlements:
+      coords = settlement.location
+      if 2 &lt; coords[0] - x or 2 &lt; coords[1] - y:
+        return False
+      return True
+
+  def build_settlement(self x, y):
+    if self.can_build_at(x, y):
+      return Settlement(x, y)
+    return None
+</code></pre>
+					</section>
+					<section><!--__main__-->
+<pre><code class="hljs lang-python">if __name__ == '__main__':
+  game = SettlersOfCatan()
+  player_1 = Player()
+  player_2 = Player()
+  # Each player builds their first settlement
+  self.settlements.append(game.build_settlement(player_1, 1, 2))
+  self.settlements.append(game.build_settlement(player_2, 2, 3))
+  # Each player builds their second starting settlement
+  self.settlements.append(game.build_settlment(player_1, 4, 7))
+  self.settlements.append(game.build_settlement(player_2, 3, 3))
+</code></pre>
+					</section>
+					<section><!--AttributeError Revealed-->
+<pre><code class="hljs lang-bash">AttributeError: 'NoneType' object has no attribute 'location'</code></pre>
+<pre class="fragment"><code class="hljs lang-python">
+# The 2nd call to build_settlement() returns None. Since the
+# result is not checked None gets added to the settlements.
+self.settlements.append(game.build_settlement(player_2, 2, 3))
+
+# The subsequent call to build_settlement() raises the
+# AttributeError when trying to get .location from None
+def can_build_at(self, x, y)
+for settlement in self.settlements:
+  coords = settlement.location
+  ...
+</code></pre>
+					</section>
+					<section>
+						<p>There is one more error though</p>
+					</section>
+					<section><!--Add is_there_a_winner to SettlersOfCatan-->
+<pre><code class="hljs lang-python">class SettlersOfCatan:
+def is_there_a_winner(self):
+  for player in self.players:
+	if player.score >= 10:
+      return True
+    return False
+</code></pre>
+					</section>
+					<section><!--Class Player-->
+<pre><code class="hljs lang-python">class Player:
+  @property
+  def score(self):
+    score = 0
+    if self.settlements is not None:
+      score += len(self.settlements)
+    if self.cities is not None:
+      score += len(self.cities)
+    if self.has_longest_road:
+	  score += 2
+    if self.has_largest_army:
+      score += 2
+    return score
+</code></pre>
+					</section>
+					<section><!--How to Fix it-->
+<pre><code class="hljs lang-python">def exceptional_build_settlement(self, x, y):
+  if self.cannot_build_at(x, y):
+    raise InvalidPlacementError(
+      f'(${x}, ${y}) is an invlaid placement.'
+    )
+  return Settlement(x, y)
+</code></pre>
+					</section>
+				</section>
+				<section><!--Systemization-->
+					<h2>Systemization</h2><!--Maybe use Integration instead-->
+					<aside class="notes">
+						<p>Exceptional is a mindset not a single act. Follow the best practives everywhere.</p>
+					</aside>
+				</section>
+				<section><!--Differentiation-->
+					<h2>Differentiation</h2>
+					<aside class="notes">
+						<p>
+							Setting yourself apart as being truly exceptional means the developer that depends on your code has a foundation of
+							good exception handling to build from.
+						</p>
+					</aside>
+				</section>
 			</div>
 		</div>
 
