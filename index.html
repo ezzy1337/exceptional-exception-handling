@@ -89,18 +89,19 @@
 					</aside>
 				</section>
 				<section class="stack"><!--Best Practice: Don't return null-->
-					<h2>Do Not Return Null Values</h2>
+					<h2>Do Not Pass or Return Null Values</h2>
 					<section>
 						<p class="fragment">null, None, nil, undefined etc.</p>
 					</section>
 					<section><!--class SettlersOfCatan-->
 <pre><code class="hljs lang-python">class SettlersOfCatan:
-  def can_build_at(self, x, y)
-    for settlement in self.settlements:
-      coords = settlement.location
-      if 2 &lt; coords[0] - x or 2 &lt; coords[1] - y:
-        return False
-      return True
+  def can_build_at(self, x, y):
+    for player in self.players:
+      for settlement in self.settlements:
+        coords = settlement.location
+        if 2 &lt; coords[0] - x or 2 &lt; coords[1] - y:
+          return False
+    return True
 
   def build_settlement(self x, y):
     if self.can_build_at(x, y):
@@ -111,14 +112,14 @@
 					<section><!--__main__-->
 <pre><code class="hljs lang-python">if __name__ == '__main__':
   game = SettlersOfCatan()
-  player_1 = Player()
-  player_2 = Player()
+  self.players.append(Player())
+  self.players(Player())
   # Each player builds their first settlement
-  self.settlements.append(game.build_settlement(player_1, 1, 2))
-  self.settlements.append(game.build_settlement(player_2, 2, 3))
+  self.players[0].settlements.append(game.build_settlement(1, 2))
+  self.players[1].settlements.append(game.build_settlement(2, 3))
   # Each player builds their second starting settlement
-  self.settlements.append(game.build_settlment(player_1, 4, 7))
-  self.settlements.append(game.build_settlement(player_2, 3, 3))
+  self.players[0].settlements.append(game.build_settlement(4, 7))
+  self.players[1].settlements.append(game.build_settlement(3, 3))
 </code></pre>
 					</section>
 					<section><!--AttributeError Revealed-->
@@ -126,26 +127,30 @@
 <pre class="fragment"><code class="hljs lang-python">
 # The 2nd call to build_settlement() returns None. Since the
 # result is not checked None gets added to the settlements.
-self.settlements.append(game.build_settlement(player_2, 2, 3))
+self.players[1].settlements.append(game.build_settlement(2, 3))
 
 # The subsequent call to build_settlement() raises the
 # AttributeError when trying to get .location from None
-def can_build_at(self, x, y)
-for settlement in self.settlements:
-  coords = settlement.location
-  ...
+def can_build_at(self, x, y):
+  for player.self.players:
+    for settlement in self.settlements:
+      coords = settlement.location
+      ...
 </code></pre>
 					</section>
 					<section>
-						<p>There is one more error though</p>
+						<p>There is one more error though!</p>
 					</section>
-					<section><!--Add is_there_a_winner to SettlersOfCatan-->
-<pre><code class="hljs lang-python">class SettlersOfCatan:
-def is_there_a_winner(self):
+					<section>
+<pre><code class="hljs lang-python">if __name__ == '__main__':
+  game = SettlersOfCatan()
+  self.players.append(Player())
+  self.players.append(Player())
+  #build first settlements
+  self.players[1].settlements.append(game.build_settlement(1, 2))
+  self.players[1].settlements.append(game.build_settlement(2, 3))
   for player in self.players:
-	if player.score >= 10:
-      return True
-    return False
+    print(player.score)
 </code></pre>
 					</section>
 					<section><!--Class Player-->
@@ -165,6 +170,7 @@ def is_there_a_winner(self):
 </code></pre>
 					</section>
 					<section><!--How to Fix it-->
+						<p>Throw/Raise an exception</p>
 <pre><code class="hljs lang-python">def exceptional_build_settlement(self, x, y):
   if self.cannot_build_at(x, y):
     raise InvalidPlacementError(
@@ -178,7 +184,58 @@ def is_there_a_winner(self):
 					<h2>Systemization</h2><!--Maybe use Integration instead-->
 					<aside class="notes">
 						<p>Exceptional is a mindset not a single act. Follow the best practives everywhere.</p>
+						<p>This is about setting yourself up for success.</p>
 					</aside>
+				</section>
+				<section class="stack">
+					<h2>Do not catch Exception</h2>
+					<section>
+						<p class="fragment">unless you are catching a more specific exception first.</p>
+						<p class="fragment">Even then...reserve it for a high level general catch all.</p>
+					</section>
+					<section><!--Example catching only exception-->
+<pre><code class="hljs lang-cs">string cmdTxt = "SELECT Count(*) as MyCnt FROM MyTable";
+SqlCommand cmd = new SqlCommand(cmdTxt, new SqlConnection());
+try {
+  cmd.connection.Open();
+  SqlDataReader reader = cmd.ExecuteReader()
+  reader.read();
+  return reader["MyCnt"]
+}
+catch (Exception e) {
+  ErrorHandler.sendEmailNotification(e);
+}
+</code></pre>
+					</section>
+					<section><!--Example catching better exceptions-->
+<pre><code class="hljs lang-cs">string cmdTxt = "SELECT count(*) as MyCnt FROM MyTable";
+SqlCommand cmd = new SqlCommand(cmdTxt, new SqlConnection());
+try {
+  cmd.connection.Open();
+  SqlDataReader reader = cmd.ExecuteReader();
+  reader.read();
+  return reader["MyCnt"]
+}
+catch (SQLException sqle) {
+  return 0;
+}
+catch (Exception e) {
+  ErrorHandler.sendEmailNotification(e)
+}
+</code></pre>
+					</section>
+				</section>
+				<section class="stack">
+					<h2>Only protected line in try block</h2>
+					<section>
+						<p>About that last example</p>
+						<p>Which line threw the exception?</p>
+					</section>
+					<section>
+<pre><code>
+
+</code></pre>
+					</section>
 				</section>
 				<section><!--Differentiation-->
 					<h2>Differentiation</h2>
