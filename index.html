@@ -141,7 +141,7 @@ def can_build_at(self, x, y):
 					<section>
 						<p>There is one more error though!</p>
 					</section>
-					<section>
+					<section><!--Nefarious score bug revealed-->
 <pre><code class="hljs lang-python">if __name__ == '__main__':
   game = SettlersOfCatan()
   self.players.append(Player())
@@ -403,6 +403,53 @@ class DuplicateSettingError(AppError):
   pass
 </code></pre>
 				</section>
+				</section>
+				<section class="stack"><!--Only Log when you can handle the exception-->
+					<h2>Only Log Where Exception is Consumed</h2>
+					<section>
+						<p class="fragment">This only works if you are providing context.</p>
+						<aside class="notes">
+							<ul>
+								<li>Heckendorn's Law</li>
+								<li>Using Context Specific Exceptions i.e. Wrap Exceptions</li>
+							</ul>
+						</aside>
+					</section>
+					<section><!--Horrible logging-->
+<pre><code class="hljs lang-python">def jump(speed):
+  raise BorgException(f'failed jump to warp {speed}')
+
+def jump_to_warp(speed):
+  try:
+    jump(speed)
+  except BorgException as be:
+    logger.exception(be); raise be
+
+if __name__ == '__main__':
+  try:
+    jump_to_warp(5)
+  except BorgException as be:
+    logger.exception(be)
+
+</code></pre>
+					</section>
+					<section><!--Better Logging with Riker Maneuver-->
+<pre><code class="hljs lang-python">def jump(speed):
+  raise BorgException(
+    f'failed jump to warp {speed}. Resistance is futile.'
+  )
+	
+def jump_to_warp(speed):
+  jump(speed)
+	
+if __name__ == '__main__':
+  try:
+    jump_to_warp(5)
+  except BorgException as be:
+    logger.exception(be)
+    riker_maneuver() # https://youtu.be/P40LIQtEE3M
+</code></pre>
+					</section>
 				</section>
 				<section><!--Differentiation-->
 					<h2>Differentiation</h2>
