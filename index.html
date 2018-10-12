@@ -259,7 +259,7 @@ try {
 					<section>
 						<p class="fragment">Unmanaged resources should be closed regardless of a success or failure.</p>
 					</section>
-					<section>
+					<section><!--Example not using finally-->
 <pre><code class="hljs lang-python">def write_config(path, content):
   try:
     config = open(path, 'wx+')
@@ -270,7 +270,7 @@ try {
     logger.exception(f'Cannot write to ${path}. The file already exists')
 </code></pre>
 					</section>
-					<section>
+					<section><!--Example using finally-->
 <pre><code class="hljs lang-python">def write_config(path, content):
   try:
     config = open('path', 'wx+')
@@ -280,6 +280,31 @@ try {
     logger.exception(f'Cannot write to ${path}. The file already exists')
   finally:
     config.close()
+</code></pre>
+					</section>
+				</section>
+				<section class="stack"><!--Use context-managers--><!--I'm debating this though cause they kinda silently swallow exceptions-->
+					<h2>Use Context Managers</h2>
+					<section>
+						<p class=fragment>The previous example can be even cleaner</p>
+					</section>
+					<section><!--Example using finally-->
+<pre><code class="hljs lang-python">def write_config(path, content):
+  try:
+    config = open('path', 'wx+')
+    for line in content:
+      config.write(line)
+  except FileExistsError as e:
+    logger.exception(f'Cannot write to ${path}. The file already exists')
+  finally:
+    config.close()
+</code></pre>
+					</section>
+					<section>
+<pre><code class="hljs lang-python">def write_config(path, content):
+  with open(path, 'wx+') as config_f:
+    for line in content:
+      config_f.write(line);
 </code></pre>
 					</section>
 				</section>
