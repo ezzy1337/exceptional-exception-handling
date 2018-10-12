@@ -353,6 +353,57 @@ isMoon(deathstar);
 					</aside>
 					</section>
 				</section>
+				<section class="stack"><!--Wrap Exceptions you are re-throwing-->
+					<h2>Wrap Exceptions You re-throw/raise</h2>
+					<section>
+						<p class="fragment">Define Exceptions for the Callers Needs.</p>
+						<aside class="notes">
+							<p>This applies to working with 3rd party libraries.</p>
+							<p>You should only catch exceptions you throw where they can be handled.</p>
+						</aside>
+					</section>
+					<section><!--Example of not wrapping exception -->
+<pre><code class="hljs lang-python">import sqlite3
+class SettingsRepository:
+  def __init__(self):
+    self.connection = sqlite3.connect('example.db')
+
+  def add(self, setting):
+    cursor = self.connection.cursor()
+    cursor.execute(
+      f'INSERT INTO settings (key, val) VALUES (?, ?)', setting
+    )
+</code></pre>
+					</section>
+					<section><!--Example wrapping exception-->
+<pre><code class="hljs lang-python">import sqlite3
+class SettingRepository:
+  def __init__(self):
+    self.connection = sqlite3('example.db')
+
+  def add(self, setting):
+    try:
+      cursor = self.connection.cursor()
+      cursor.execute(
+        f'INSERT INTO settings (key, val) VALUES (?,?)', setting
+      )
+    except IntegrityError as ie:
+      raise DuplicateSettingError(
+        f'{setting[0]} already exists', ie
+      )
+</code></pre>
+					</section>
+					<section><!--Setting up exception wrapping in Python-->
+<pre><code class="hljs lang-python">class AppError(Exception):
+  def __init__(self, message, inner):
+    super(AppError, self).__init__(self, message)
+    self.inner = inner
+
+class DuplicateSettingError(AppError):
+  pass
+</code></pre>
+				</section>
+				</section>
 				<section><!--Differentiation-->
 					<h2>Differentiation</h2>
 					<aside class="notes">
