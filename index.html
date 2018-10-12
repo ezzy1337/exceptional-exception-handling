@@ -267,7 +267,7 @@ try {
       config.write(line)
       config.close()
   except FileExistsError as e:
-    logger.exception(f'Cannot write to ${path}. The file already exists')
+    logger.exception('Cannot overwrite existing config file')
 </code></pre>
 					</section>
 					<section><!--Example using finally-->
@@ -277,7 +277,7 @@ try {
     for line in content:
       config.write(line)
   except FileExistsError as e:
-    logger.exception(f'Cannot write to ${path}. The file already exists')
+    logger.exception('Cannot overwrite existing config file')
   finally:
     config.close()
 </code></pre>
@@ -295,7 +295,7 @@ try {
     for line in content:
       config.write(line)
   except FileExistsError as e:
-    logger.exception(f'Cannot write to ${path}. The file already exists')
+    logger.exception('Cannot overwrite existing config file')
   finally:
     config.close()
 </code></pre>
@@ -306,6 +306,51 @@ try {
     for line in content:
       config_f.write(line);
 </code></pre>
+					</section>
+				</section>
+				<section class="stack"><!--Heckendorn's Law-->
+					<h2>Heckendorn's Law</h2>
+					<section>
+						<p class="fragment">
+							"Thou shalt provide complete error messages." <br/>- Robert Heckendorn
+						</p>
+					</section>
+					<section><!--Example of static error message-->
+<pre><code class="hljs lang-cs">class Celestial {}
+class DeathStar : Celestial {}
+class Moon : Celestial {}
+
+public static bool isMoon(Celestial celestial) {
+  Type type = celestial.GetType();
+  if (type != typeof(Moon))
+    throw new ArgumentException("That's no Moon");
+  ...
+  return true;
+}
+
+DeathStar deathstar = new DeathStar();
+isMoon(deathstar);
+</code></pre>
+					</section>
+					<section><!--Example of dynamic error message-->
+<pre><code class="hljs lang-cs">class Celestial {}
+class DeathStar : Celestial {}
+class Moon : Celestial {}
+		
+public static bool isMoon(Celestial celestial) {
+  Type type = celestial.GetType();
+  if (type != typeof(Moon))
+    throw new ArgumentException($"A {type} is no Moon");
+    ...
+    return true;
+  }
+		
+DeathStar deathstar = new DeathStar();
+isMoon(deathstar);
+</code></pre>
+					<aside class="notes">
+						<p>Instead of, "You do not have the permission for that action" say, "You do not have write permissions for `path` directory."</p>
+					</aside>
 					</section>
 				</section>
 				<section><!--Differentiation-->
