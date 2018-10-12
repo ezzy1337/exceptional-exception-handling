@@ -187,8 +187,8 @@ def can_build_at(self, x, y):
 						<p>This is about setting yourself up for success.</p>
 					</aside>
 				</section>
-				<section class="stack">
-					<h2>Do not catch Exception</h2>
+				<section class="stack"><!--Don't simply catch Exception-->
+					<h2>Don't catch Exception</h2>
 					<section>
 						<p class="fragment">unless you are catching a more specific exception first.</p>
 						<p class="fragment">Even then...reserve it for a high level general catch all.</p>
@@ -198,9 +198,9 @@ def can_build_at(self, x, y):
 SqlCommand cmd = new SqlCommand(cmdTxt, new SqlConnection());
 try {
   cmd.connection.Open();
-  SqlDataReader reader = cmd.ExecuteReader()
+  SqlDataReader reader = cmd.ExecuteReader();
   reader.read();
-  return reader["MyCnt"]
+  return Convert.ToInt32(reader["MyCnt"]);
 }
 catch (Exception e) {
   ErrorHandler.sendEmailNotification(e);
@@ -214,26 +214,72 @@ try {
   cmd.connection.Open();
   SqlDataReader reader = cmd.ExecuteReader();
   reader.read();
-  return reader["MyCnt"]
-}
-catch (SQLException sqle) {
-  return 0;
-}
-catch (Exception e) {
-  ErrorHandler.sendEmailNotification(e)
+  return Convert.ToInt32(reader["MyCnt"]);
+} catch (InvalidOperationException sqle) {
+  return -1;
+} catch (FormatException fe) {
+  return -1;
+} catch (Exception e) {
+  ErrorHandler.sendEmailNotification(e);
 }
 </code></pre>
+						<aside class="notes">
+							<p>We can do better than just sending an email when an exception occurs.</p>
+							<p>Some errors we know could be resolved without code changes so return a usable but obviously incorrect value.</p>
+						</aside>
 					</section>
 				</section>
-				<section class="stack">
-					<h2>Only protected line in try block</h2>
+				<section class="stack"><!--One line in the try block-->
+					<h2>Only include the protected line in a try block</h2>
 					<section>
-						<p>About that last example</p>
-						<p>Which line threw the exception?</p>
+							<p class="fragment">Which line threw FormatException?</p>
+							<p class="fragment">Which threw InvalidOperationException?</p>
+					</section>
+					<section><!--Example with a single line in the try block-->
+<pre><code class="hljs lang-cs">try{
+  cmd.connection.Open();
+} catch (InvalidOperationException ioe) {
+  if (cmd.connection.State == ConnectionState.Broken) {
+    cmd.connection.close();
+    cmd.connection.open();
+  } else {
+    throw ioe;
+	}
+	...
+}
+</code></pre>
+						<aside class="notes">
+							<p>Now we know exactly how to handle an InvalidOperationException.</p>
+							<p>If the connection is broken it can be fixed simply by closing and reopening the connection.</p>
+						</aside>
+					</section>
+				</section>
+				<section class="stack"><!--Defer clean-up-->
+					<h2>Defer Clean-up for the finally block</h2>
+					<section>
+						<p class="fragment">Unmanaged resources should be closed regardless of a success or failure.</p>
 					</section>
 					<section>
-<pre><code>
-
+<pre><code class="hljs lang-python">def write_config(path, content):
+  try:
+    config = open(path, 'wx+')
+    for line in content:
+      config.write(line)
+      config.close()
+  except FileExistsError as e:
+    logger.exception(f'Cannot write to ${path}. The file already exists')
+</code></pre>
+					</section>
+					<section>
+<pre><code class="hljs lang-python">def write_config(path, content):
+  try:
+    config = open('path', 'wx+')
+    for line in content:
+      config.write(line)
+  except FileExistsError as e:
+    logger.exception(f'Cannot write to ${path}. The file already exists')
+  finally:
+    config.close()
 </code></pre>
 					</section>
 				</section>
