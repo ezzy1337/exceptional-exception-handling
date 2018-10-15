@@ -88,8 +88,8 @@
 						<p>This is all about avoiding the anti-patterns, and mistakes that lead to poorly structured code.
 					</aside>
 				</section>
-				<section class="stack"><!--Best Practice: Don't return null-->
-					<h2>Do Not Pass or Return Null Values</h2>
+				<section class="stack"><!--Best Practice: Don't return or pass null-->
+					<h2>Don't Pass or Return Null Values</h2>
 					<section>
 						<p class="fragment">null, None, nil, undefined etc.</p>
 					</section>
@@ -174,7 +174,7 @@ def can_build_at(self, x, y):
 <pre><code class="hljs lang-python">def exceptional_build_settlement(self, x, y):
   if self.cannot_build_at(x, y):
     raise InvalidPlacementError(
-      f'(${x}, ${y}) is an invlaid placement.'
+      f'(${x}, ${y}) is an invalid placement.'
     )
   return Settlement(x, y)
 </code></pre>
@@ -194,7 +194,6 @@ def can_build_at(self, x, y):
 					<h2>Don't catch Exception</h2>
 					<section>
 						<p class="fragment">unless you are catching a more specific exception first.</p>
-						<p class="fragment">Even then...reserve it for a high level general catch all.</p>
 					</section>
 					<section><!--Example catching only exception-->
 <pre><code class="hljs lang-cs">string cmdTxt = "SELECT Count(*) as MyCnt FROM MyTable";
@@ -247,7 +246,7 @@ try {
     cmd.connection.open();
   } else {
     throw ioe;
-	}
+  }
 	...
 }
 </code></pre>
