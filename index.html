@@ -85,7 +85,7 @@
 				<section><!--Prevention-->
 					<h2>Prevention</h2>
 					<aside class="notes">
-						<p>This is all about avoiding the anti-patterns, and mistakes that lead to poorly structured code.
+						<p>The best way to handle exceptions is to never cause them.</p>
 					</aside>
 				</section>
 				<section class="stack"><!--Best Practice: Don't return or pass null-->
@@ -187,7 +187,7 @@ def can_build_at(self, x, y):
 					<h2>Systemization</h2><!--Maybe use Integration instead-->
 					<aside class="notes">
 						<p>Exceptional is a mindset not a single act. Follow the best practives everywhere.</p>
-						<p>This is about setting yourself up for success.</p>
+						<p>At some point you'll have to deal with exceptions. This is how to deal with them.</p>
 					</aside>
 				</section>
 				<section class="stack"><!--Don't simply catch Exception-->
@@ -376,6 +376,9 @@ class SettingsRepository:
       f'INSERT INTO settings (key, val) VALUES (?, ?)', setting
     )
 </code></pre>
+					<aside class="notes">
+						<p>By wrapping Exceptions thrown by thrid party libraries you are reducing the dependency on that library.</p>
+					</aside>
 					</section>
 					<section><!--Example wrapping exception-->
 <pre><code class="hljs lang-python">import sqlite3
@@ -456,19 +459,17 @@ if __name__ == '__main__':
 				<section><!--Differentiation-->
 					<h2>Differentiation</h2>
 					<aside class="notes">
-						<p>
-							Setting yourself apart as being truly exceptional means the developer that depends on your code has a foundation of
-							good exception handling to build from.
-						</p>
+						<p>Set yourself apart by making it easier for developers to consume your libraries.</p>
 					</aside>
 				</section>
 				<section><!--Don't use checked exceptions-->
 						<h2>Don't Use Checked Exceptions</h2>
 						<p class="fragment">Looking at you Java!</p>
 				</section>
-				<section>
+				<section><!--Document the exceptions you throw-->
 					<h2>Document the exceptions you raise/throw</h2>
 					<aside class="notes">
+						<p>It's all the benefits of checked exceptions without the drawbacks.</p>
 						<p>Often times it's more interesting to know what happens when something fails rather than when it works.</p>
 						<ul>
 							<li>Network Errors</li>
@@ -476,6 +477,117 @@ if __name__ == '__main__':
 							<li>OS Errors</li>
 						</ul>
 					</aside>
+				</section>
+				<section><!--Being Exceptional-->
+					<h2>Exceptionally dealing with libraries exceptions</h2>
+					<aside class="notes">
+						<p>Not talking about any one here because you are all perfect developers and will follow everything we've talked about so far 
+							however when you have to deal with third party libraries that didn't attend this talk.
+						</p>
+					</aside>
+				</section>
+				<section class="stack"><!--Wrap Exceptions-->
+					<h2>Wrap Exceptions</h2>
+					<section>
+						<p class="fragment">and throw a common exception type</p>
+					</section>
+					<section><!--Example catching all the exceptions-->
+<pre><code class="hljs lang-cs">ACMEPort port = new ACMEPort();
+try {
+  port.open();
+} catch (DeviceResponseException e) {
+  reportPortError(e);
+  logger.log("Device Response exception", e)
+} catch (ATM121UnlockedException e) {
+  reportPortError(e);
+  logger.log("Device Response exception", e)
+} catch (GMXError e) {
+  reportPortError(e)
+  logger.log("Device Response exception", e)
+} finally {
+ ..
+}
+</code></pre>
+					</section>
+					<section><!--Example raising common exception-->
+<pre><code class="hljs lang-cs">public class LocalPort {
+  private ACMEPort port;
+  public void open() {
+    try {
+      this.port.open();
+    } catch (DeviceResponseException e) {
+      throw new PortException(e);
+    } catch (ATM121UnlockedException(e)) {
+      throw new PortException(e);
+    } catch (GMXError e) {
+      throw new PortException(e);
+    }
+  }
+}
+</code></pre>
+					</section>
+					<section><!--Example of calling code with common exceptions-->
+<pre><code class="hljs lang-cs">LocalPort port = new LocalPort();
+try {
+  port.open();
+} catch (PortException e) {
+  reportError(e)
+  logger.log(e.getMessage(), e)
+}
+</code></pre>
+					</section>
+				</section>
+				<section class="stack"><!--Use Special Case Pattern-->
+					<h2>Use Special Case Pattern</h2>
+					<section>
+            <p>or the null object pattern</p>
+					</section>
+					<section><!--Client code without using Special Case Object-->
+<pre><code class="hljs lang-cs">public calculatePay(int employeeId) {
+  Employee employee = this.employees.FindByID(employeeId);
+  if (employee != null) {
+    if employee.isHourly() {
+      return employee.rate() * employee.hoursWorked();
+    }
+    return employee.rate();
+  }
+  return 0;
+}
+</code></pre>
+					</section>
+					<section><!--Example of client code using Special Case Pattern.-->
+						<p>It's much cleaner without null checks.</p>
+<pre><code class="hljs lang-cs">public calculatePay(int employeeId) {
+  Employee employee = this.employees.FindById(employeeId);
+  if (employee.isHourly()) {
+    return employee.rate() * employee.hoursWorked();
+  }
+  return employe.rate();
+}
+</code></pre>
+					</section>
+					<section>
+						<p>return a special case when no employee is found</p>
+<pre><code class="hljs lang-cs">public EmployeeRepository {
+  public Employee FindById(int id) {
+    try {
+      this.employees.Where(e =&gt; e.Id == id);
+    } catch (EmployeeNotFoundException e) {
+      return NotFoundEmployee()
+    }
+  }
+}
+</code></pre>
+					</section>
+					<section><!--Definition of NotFoundEmployee-->
+						<p>Special Case Object</p>
+<pre><code class="hljs lang-cs">public NotFoundEmployee : IEmployee {
+  public bool isHourly() { return false; }
+  public double rate() { return 0.0; }
+  public int hoursWorked() { return 0; }
+}
+</code></pre>
+					</section>
 				</section>
 			</div>
 		</div>
