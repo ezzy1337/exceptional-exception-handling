@@ -108,6 +108,12 @@
       return Settlement(x, y)
     return None
 </code></pre>
+						<aside class="notes">
+							<ul>
+								<li>Ask who has played the game.</li>
+								<li>Skim code and review rules for building settlements.</li>
+							</ul>
+						</aside>
 					</section>
 					<section><!--__main__-->
 <pre><code class="hljs lang-python">if __name__ == '__main__':
@@ -121,9 +127,13 @@
   self.players[0].settlements.append(game.build_settlement(4, 7))
   self.players[1].settlements.append(game.build_settlement(3, 3))
 </code></pre>
+						<aside class="notes">
+							<p>Take a minute to try and figure out what happens in this __main__()</p>
+						</aside>
 					</section>
 					<section><!--AttributeError Revealed-->
 <pre><code class="hljs lang-bash">AttributeError: 'NoneType' object has no attribute 'location'</code></pre>
+<!--Thinking about removing this code snippet-->
 <pre class="fragment"><code class="hljs lang-python">
 # The 2nd call to build_settlement() returns None. Since the
 # result is not checked None gets added to the settlements.
@@ -137,6 +147,13 @@ def can_build_at(self, x, y):
       coords = settlement.location
       ...
 </code></pre>
+						<aside class="notes">
+							<ul>
+								<li>Result from 2nd game.build_settlement() is not checked for None</li>
+								<li>None gets appended to the list of settlements.</li>
+								<li>The next time can_build_at is called an AttributeException will get thrown</li>
+							</ul>
+						</aside>
 					</section>
 					<section>
 						<p>There is one more error though!</p>
@@ -152,6 +169,9 @@ def can_build_at(self, x, y):
   for player in self.players:
     print(player.score)
 </code></pre>
+						<aside class="notes">
+							<p>What happens when we try to calculate the players scores?</p>
+						</aside>
 					</section>
 					<section><!--Class Player-->
 <pre><code class="hljs lang-python">class Player:
@@ -168,6 +188,10 @@ def can_build_at(self, x, y):
       score += 2
     return score
 </code></pre>
+					<aside class="notes">
+							<p>Everything should be fine since there is a not None check on both self.settlements and self.cities right?</p>
+							<p>Wrong! Since there can be a none in the list of settlements a player could get an extra point from an invalid placement.</p>
+						</aside>
 					</section>
 					<section><!--How to Fix it-->
 						<p>Throw/Raise an exception</p>
@@ -178,6 +202,9 @@ def can_build_at(self, x, y):
     )
   return Settlement(x, y)
 </code></pre>
+						<aside class="notes">
+							<p>Simply raising an exception removes all the None checks and prevents bugs from slipping through.</p>
+						</aside>
 					</section>
 					<section><!--Magic reveal-->
 						<h1>MAGIC!</h1>
@@ -208,6 +235,11 @@ catch (Exception e) {
   ErrorHandler.sendEmailNotification(e);
 }
 </code></pre>
+						<aside class="notes">
+							<ul>
+								<li>Usually developers do this when they don't understand what can go wrong with their call.</li>
+							</ul>
+						</aside>
 					</section>
 					<section><!--Example catching better exceptions-->
 <pre><code class="hljs lang-cs">string cmdTxt = "SELECT count(*) as MyCnt FROM MyTable";
@@ -225,9 +257,12 @@ try {
   ErrorHandler.sendEmailNotification(e);
 }
 </code></pre>
-						<aside class="notes">
-							<p>We can do better than just sending an email when an exception occurs.</p>
-							<p>Some errors we know could be resolved without code changes so return a usable but obviously incorrect value.</p>
+					<aside class="notes">
+							<ul>
+								<li>Cleaner than using return codes with switch or if/else statements.</li>
+								<li>Allows us to recover in certain instances</li>
+								<li>Allows more useful reporting of the error.</li>
+							</ul>
 						</aside>
 					</section>
 				</section>
@@ -236,6 +271,9 @@ try {
 					<section>
 							<p class="fragment">Which line threw FormatException?</p>
 							<p class="fragment">Which threw InvalidOperationException?</p>
+							<aside class="notes">
+								<p>There are still a few unanswered questions about the previous example.</p>
+							</aside>
 					</section>
 					<section><!--Example with a single line in the try block-->
 <pre><code class="hljs lang-cs">try{
@@ -251,8 +289,7 @@ try {
 }
 </code></pre>
 						<aside class="notes">
-							<p>Now we know exactly how to handle an InvalidOperationException.</p>
-							<p>If the connection is broken it can be fixed simply by closing and reopening the connection.</p>
+							<p>Knowing the Open() call raises InvalidOperationException lets us fix broken connections without stopping the user action.</p>
 						</aside>
 					</section>
 				</section>
@@ -316,6 +353,12 @@ try {
 						<p class="fragment">
 							"Thou shalt provide complete error messages." <br/>- Robert Heckendorn
 						</p>
+						<aside class="notes">
+							<ul>
+								<li>Static messages don't really say anything useful. other than a timestamp or stack trace.</li>
+								<li>You can always say something more than a static error message</li>
+							</ul>
+						</aside>
 					</section>
 					<section><!--Example of static error message-->
 <pre><code class="hljs lang-cs">class Celestial {}
@@ -361,7 +404,7 @@ isMoon(deathstar);
 						<p class="fragment">Define Exceptions for the Callers Needs.</p>
 						<aside class="notes">
 							<p>This applies to working with 3rd party libraries.</p>
-							<p>You should only catch exceptions you throw where they can be handled.</p>
+							<p>Only catch re-thrown exceptions where they can be handled.</p>
 						</aside>
 					</section>
 					<section><!--Example of not wrapping exception -->
@@ -377,10 +420,10 @@ class SettingsRepository:
     )
 </code></pre>
 					<aside class="notes">
-						<p>By wrapping Exceptions thrown by thrid party libraries you are reducing the dependency on that library.</p>
+						<p>Wrapping 3rd party exceptions reduces dependency on that library.</p>
 					</aside>
 					</section>
-					<section><!--Example wrapping exception-->
+					<section><!--Example wrapping exception--><!--Maybe switch this to my ApplianceNotCOnfigured code-->
 <pre><code class="hljs lang-python">import sqlite3
 class SettingRepository:
   def __init__(self):
@@ -465,16 +508,22 @@ if __name__ == '__main__':
 				<section><!--Don't use checked exceptions-->
 						<h2>Don't Use Checked Exceptions</h2>
 						<p class="fragment">Looking at you Java!</p>
+						<aside class="notes">Checked exceptions sounds like a good idea until a low level module throws a new exception.</aside>
 				</section>
 				<section><!--Document the exceptions you throw-->
 					<h2>Document the exceptions you raise/throw</h2>
 					<aside class="notes">
-						<p>It's all the benefits of checked exceptions without the drawbacks.</p>
-						<p>Often times it's more interesting to know what happens when something fails rather than when it works.</p>
 						<ul>
-							<li>Network Errors</li>
-							<li>Disk Errors</li>
-							<li>OS Errors</li>
+							<li>It's all the benefits of checked exceptions without the drawbacks.</li>
+							<li>Often times it's more interesting to know what happens when something fails rather than when it works.</li>
+							<li>
+								<ul>
+									<li>Network Errors</li>
+									<li>Disk Errors</li>
+									<li>OS Errors</li>
+								</ul>
+							</li>
+							<li>Often times lack of documentation is why developers just catch exception.</li>
 						</ul>
 					</aside>
 				</section>
